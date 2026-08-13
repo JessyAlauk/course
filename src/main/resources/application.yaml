@@ -1,3 +1,7 @@
 spring:
   application:
     name: course
+  profiles:
+    active: true
+  jpa:
+    open-in-view: true
