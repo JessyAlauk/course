@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Entity
 @Table(name = "tb_order")
@@ -83,6 +84,13 @@ public class Order {
 
     public Set<OrderItem> getItems() {
         return items;
+    }
+
+    public Double getTotal() {
+        return items.stream()
+                .mapToDouble(OrderItem::getSubTotal)
+                .sum();
+
     }
 
     @Override
