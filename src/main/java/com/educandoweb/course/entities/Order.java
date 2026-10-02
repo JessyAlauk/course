@@ -32,6 +32,9 @@ public class Order {
     @OneToMany(mappedBy = "id.order")
     private Set<OrderItem> items = new HashSet<>();
 
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
+
     public Order() {
     }
 
@@ -43,6 +46,15 @@ public class Order {
         this.moment = moment;
         this.orderStatus = orderStatus.getCode();
         this.client = client;
+    }
+
+    public Order(Long id, Instant moment, Integer orderStatus, User client, Set<OrderItem> items, Payment payment) {
+        this.id = id;
+        this.moment = moment;
+        this.orderStatus = orderStatus;
+        this.client = client;
+        this.items = items;
+        this.payment = payment;
     }
 
     public Long getId() {
@@ -59,6 +71,14 @@ public class Order {
 
     public User getClient() {
         return client;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void addPayment(Payment payment){
+        this.payment = payment;
     }
 
     public Set<OrderItem> getItems() {

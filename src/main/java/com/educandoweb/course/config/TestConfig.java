@@ -1,10 +1,6 @@
 package com.educandoweb.course.config;
 
-import com.educandoweb.course.entities.Category;
-import com.educandoweb.course.entities.Order;
-import com.educandoweb.course.entities.Product;
-import com.educandoweb.course.entities.User;
-import com.educandoweb.course.entities.OrderItem;
+import com.educandoweb.course.entities.*;
 import com.educandoweb.course.entities.enums.OrderStatus;
 import com.educandoweb.course.repositories.*;
 import org.springframework.boot.CommandLineRunner;
@@ -111,5 +107,11 @@ public class TestConfig implements CommandLineRunner {
         OrderItem oi4 = new OrderItem(o3, p5, 2, p5.getPrice());
 
         orderItemRepository.saveAll(Arrays.asList(oi1, oi2, oi3, oi4));
+
+        Payment payment = new Payment(null, Instant.parse("2026-07-23T15:21:22Z"), o3);
+
+        o3.addPayment(payment);
+
+        orderRepository.save(o3);
     }
 }
