@@ -25,6 +25,9 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
 
+    @OneToMany(mappedBy = "id.product")
+    private Set<OrderItem> items = new HashSet<>();
+
     public Product() {
     }
 
@@ -62,6 +65,12 @@ public class Product {
 
     public Set<Category> getCategories() {
         return categories;
+    }
+
+    public Set<Order> getOrder() {
+        var set = new HashSet<Order>();
+        items.forEach( x -> set.add(x.getOrder()));
+        return set;
     }
 
     @Override
