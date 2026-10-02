@@ -23,4 +23,8 @@ public class UserService {
         var obj = userRepository.findById(id);
         return obj.get();
     }
+
+    public User insert(User obj){
+        return userRepository.save(obj);
+    }
 }
