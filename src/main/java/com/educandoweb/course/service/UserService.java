@@ -1,6 +1,9 @@
 package com.educandoweb.course.service;
 
+import com.educandoweb.course.dto.UserPostRequestBodyDTO;
+import com.educandoweb.course.dto.UserPutRequestBodyDTO;
 import com.educandoweb.course.entities.User;
+import com.educandoweb.course.mapper.UserMapper;
 import com.educandoweb.course.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +27,19 @@ public class UserService {
         return obj.get();
     }
 
-    public User insert(User obj){
-        return userRepository.save(obj);
+    public User insert(UserPostRequestBodyDTO obj){
+        var user = UserMapper.toSave(obj);
+        return userRepository.save(user);
     }
 
     public void delete(Long id){
         userRepository.deleteById(id);
+    }
+
+    public User update(Long id, UserPutRequestBodyDTO obj){
+        var oldUser = userRepository.getReferenceById(id);
+        var newUser = new UserPutRequestBodyDTO(id, obj.name(), obj.email(), obj.phone(), oldUser.getPassword());
+        var updatedUser = UserMapper.toSave(newUser);
+        return userRepository.save(updatedUser);
     }
 }
