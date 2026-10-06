@@ -5,6 +5,11 @@ import com.educandoweb.course.dto.UserPutRequestBodyDTO;
 import com.educandoweb.course.entities.User;
 import com.educandoweb.course.mapper.UserMapper;
 import com.educandoweb.course.repositories.UserRepository;
+import com.educandoweb.course.service.exceptions.DataBaseException;
+import com.educandoweb.course.service.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +29,7 @@ public class UserService {
 
     public User findById (Long id){
         var obj = userRepository.findById(id);
-        return obj.get();
+        return obj.orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
     public User insert(UserPostRequestBodyDTO obj){
@@ -33,13 +38,30 @@ public class UserService {
     }
 
     public void delete(Long id){
-        userRepository.deleteById(id);
+        try{
+
+        userRepository.findById(id)
+                .ifPresentOrElse(s -> userRepository.deleteById(s.getId()),
+                        () -> {
+                            throw new ResourceNotFoundException(id);
+                        });
+        } catch (DataIntegrityViolationException e){
+            throw new DataBaseException(e.getMessage());
+        }catch (Exception e){
+            throw new ResourceNotFoundException(id);
+        }
+
     }
 
     public User update(Long id, UserPutRequestBodyDTO obj){
-        var oldUser = userRepository.getReferenceById(id);
-        var newUser = new UserPutRequestBodyDTO(id, obj.name(), obj.email(), obj.phone(), oldUser.getPassword());
-        var updatedUser = UserMapper.toSave(newUser);
-        return userRepository.save(updatedUser);
+        try {
+            var oldUser = userRepository.getReferenceById(id);
+            var newUser = new UserPutRequestBodyDTO(id, obj.name(), obj.email(), obj.phone(), oldUser.getPassword());
+            var updatedUser = UserMapper.toSave(newUser);
+            return userRepository.save(updatedUser);
+        }catch (EntityNotFoundException e){
+            e.printStackTrace();
+            throw new ResourceNotFoundException(id);
+        }
     }
 }
